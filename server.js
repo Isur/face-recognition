@@ -12,11 +12,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const add = require('./routes/api/add');
 const get = require('./routes/api/get');
 const findSimilarFace = require('./routes/api/findSimilarFace');
-// const remove = require('./routes/api/remove');
-app.use('/add', add);  
+const remove = require('./routes/api/remove');
+app.use('/add', add);
 app.use('/get', get);
 app.use('/find', findSimilarFace);
-// app.use('/delete', remove);
+app.use('/delete', remove);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Server started on port ${port}`));

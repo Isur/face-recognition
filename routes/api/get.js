@@ -10,7 +10,7 @@ const link = `https://${API_REGION}.api.cognitive.microsoft.com/face/v1.0/`;
 const header = { "Ocp-Apim-Subscription-Key": API_KEY }
 
 // GET ALL FROM LIST: list
-router.get('/all/:list', (req,res) => {
+router.get('/all/:faceListId', (req,res) => {
     const faceListId = req.params.faceListId
     const query = link + `facelists/${faceListId}`;
     axios({
@@ -19,7 +19,7 @@ router.get('/all/:list', (req,res) => {
         headers: header,
     })
     .then(response => res.json(response.data))
-    .catch(err => res.json({error: err}));
+    .catch(err => console.log(err));
 })
 
 // GET ALL LISTS
@@ -48,7 +48,7 @@ router.get('/lists', (req,res) => {
     })
 
 // GET PERSON GROUP BY ID
-router.get('/personGroups/:id', (req,res)=>{
+router.get('/personGroups/:personGroupId', (req,res)=>{
     const personGroupId = req.params.personGroupId;
     const query = link + `persongroups/${personGroupId}`;
     axios({
@@ -60,8 +60,8 @@ router.get('/personGroups/:id', (req,res)=>{
     .catch(err => res.json({error: err}));
 })
 
-// GET PERSONS FROM PERSON GROUP 
-router.get('/personlist/:id', (req,res)=>{
+// GET PERSONS FROM PERSON GROUP
+router.get('/personlist/:personGroupId', (req,res)=>{
     const personGroupId = req.params.personGroupId;
     const query = link + `persongroups/${personGroupId}/persons`;
     axios({
