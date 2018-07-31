@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Segment } from 'semantic-ui-react';
+
+import Router from './Components/Router';
+import Menu from './Components/menu';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Face recognition</h1>
-        </header>
-        <p className="App-intro">
-          Rozponamy Twoją twarz!
-        </p>
-      </div>
+      <Segment inverted >
+        <Menu />
+        <Router />
+      </Segment>
     );
   }
 }

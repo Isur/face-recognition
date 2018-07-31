@@ -37,6 +37,8 @@ router.post('/identify/', (req,res) => {
         data:{
             personGroupId: personGroupId,
             faceIds: faceIds,
+            confidenceThreshold: 0.1,
+            maxNumOfCandidatesReturned: 10,
         }
     })
     .then(response => res.json(response.data))
