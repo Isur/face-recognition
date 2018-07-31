@@ -7,9 +7,9 @@ req: {
     id: String   
 }
 
-res: ...
+res: ""
 
-2)create PersonGroup
+2)add person to personGroup
 POST http://localhost:5000/add/addPerson/
 req: {
     personGroupId: String
@@ -19,7 +19,7 @@ req: {
 
 res: ...
 
-3) add face to personGroupId
+3) add face to person
 POST http://localhost:5000/add/addFace/
 req: {
     personGroupId: String
@@ -34,7 +34,7 @@ FACE STUFF
 4) Get information about face
 POST http://localhost:5000/face/detect/
 req: {
-    image: String // url of image
+    imageURL: String // url of image
 }
 
 res: ...
@@ -46,23 +46,56 @@ req: {
     personGroupId: String
 }
 
-res: ... 
+res: [
+    ...
+    {
+        faceId: String,
+        candidates: [
+            ...
+            {
+                personId: String,
+                confidence: Number
+
+            }
+        ]
+    }
+]
 
 GET STUFF
 6) get all from  given list
 GET http://localhost:5000/get/all/:faceListId
 
-res: ...
+res: {
+    persistedFaces: [],
+    faceListId: String,
+    name: String,
+    userData: String
+
+}
 
 7) get all lists
 GET http://localhost:5000/get/lists
 
-res: ...
+res: [
+    ...
+    {
+        faceListId: String
+        name: String
+        userData: String
+    }
+]
 
 8) get all person groups
 GET http://localhost:5000/get/personGroups
 
-res: ...
+res: [
+    ...
+    {
+        personGroupId: String
+        name: String
+        userData: String
+    }
+]
 
 9) get person group by id
 GET http://localhost:5000/get/personGroups/:personGroupId
@@ -72,7 +105,15 @@ res: ...
 10) get people from person group
 GET http://localhost:5000/get/personlist/:personGroupId
 
-res: ...
+res: [
+    ...
+    {
+        personId: String
+        persistedFacesIds: []
+        name: String
+        userData: String
+    }
+]
 
 11) get person from person group by id
 GET http://localhost:5000/get/person?personGroupId=[]&personId=[]
