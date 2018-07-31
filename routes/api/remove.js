@@ -38,6 +38,17 @@ router.delete('/face', (req,res) => {
     .catch(err => console.log(err.response.statusText));
 })
 
-//
+// DELETE PERSON GROUP
+router.delete('/persongroup/:personGroupId', (req,res) => {
+    const personGroupId = req.params.personGroupId;
+    const query = link + `persongroups/${personGroupId}`;
+    axios({
+        method: 'delete',
+        url: query,
+        headers: header,
+    })
+    .then(response => res.json(response.data))
+    .catch(err => res.json({error: err}));
+})
 
 module.exports = router;
