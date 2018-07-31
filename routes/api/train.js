@@ -22,7 +22,7 @@ router.post('/traingroup/', (req,res) => {
 })
 
 // TRAIN STATUS
-router.post('/traingroup/', (req,res) => {
+router.post('/trainstatus/', (req,res) => {
     const personGroupId = req.body.personGroupId;
     const query = link + `persongroups/${personGroupId}/training`;
     axios({
