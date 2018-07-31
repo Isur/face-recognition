@@ -1,0 +1,103 @@
+ADDING STUFF
+1)create group of people (PersonGroup)
+POST http://localhost:5000/add/addPersonGroup/
+req: {
+    name: String
+    userData: String
+    id: String   
+}
+
+res: ...
+
+2)create PersonGroup
+POST http://localhost:5000/add/addPerson/
+req: {
+    personGroupId: String
+    name: String
+    userData: String
+}
+
+res: ...
+
+3) add face to personGroupId
+POST http://localhost:5000/add/addFace/
+req: {
+    personGroupId: String
+    personId: String
+    image: String // url of image
+    userData: String
+}
+
+res: ...
+
+FACE STUFF
+4) Get information about face
+POST http://localhost:5000/face/detect/
+req: {
+    image: String // url of image
+}
+
+res: ...
+
+5) Identify face
+POST http://localhost:5000/face/identify/
+req: {
+    faceIds: array of strings
+    personGroupId: String
+}
+
+res: ... 
+
+GET STUFF
+6) get all from  given list
+GET http://localhost:5000/get/all/:faceListId
+
+res: ...
+
+7) get all lists
+GET http://localhost:5000/get/lists
+
+res: ...
+
+8) get all person groups
+GET http://localhost:5000/get/personGroups
+
+res: ...
+
+9) get person group by id
+GET http://localhost:5000/get/personGroups/:personGroupId
+
+res: ...
+
+10) get people from person group
+GET http://localhost:5000/get/personlist/:personGroupId
+
+res: ...
+
+11) get person from person group by id
+GET http://localhost:5000/get/person?personGroupId=[]&personId=[]
+
+res: ...
+
+12) get person face by id/ by person/ by person group
+GET http://localhost:5000/get/personface?personGroupId=[]&personId=[]&face_id=[]
+
+res: ...
+
+13) 14) 15) - remove
+
+TRAINING
+16) POST http://localhost:5000/train/traingroup/
+req.body: {
+    personGroupId: String
+}
+
+res: ...
+
+17) POST http://localhost:5000/train/trainstatus/
+req.body: {
+    personGroupId: String
+}
+
+res: ...
+
