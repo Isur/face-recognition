@@ -65,6 +65,7 @@ class Identify extends React.Component{
             }).then(res => this.setState({result: res.data, resultReady: false, candidates: res.data[0].candidates}, () => {
             var i = 0; 
             var cans = this.state.candidates;   
+            console.log(`andzrej ${cans}`);
             this.state.candidates.map((item) => {
                     axios({
                         method: 'get',
