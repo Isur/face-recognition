@@ -13,7 +13,7 @@ const TableRow = (props) => {
 
 const ResultTable = (props) => {
     return(
-    <Table  celled inverted selectable>
+    <Table  celled selectable>
         <Table.Header>
             <Table.Row>
                 <Table.HeaderCell> Element </Table.HeaderCell>
@@ -59,7 +59,7 @@ class Analyze extends React.Component{
 
     render(){
         return(
-            <Segment inverted>
+            <Segment>
             <Form>
                 <Form.Input placeholder="Adres do zdjęcia" onChange={this.InputChange} />
                 <Button onClick={this.getResult}>Prześlij</Button>

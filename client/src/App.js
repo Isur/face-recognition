@@ -8,7 +8,7 @@ import Menu from './Components/menu';
 class App extends Component {
   render() {
     return (
-      <Segment inverted >
+      <Segment  >
         <Menu />
         <Router />
       </Segment>

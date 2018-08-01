@@ -21,7 +21,7 @@ const header = { "Ocp-Apim-Subscription-Key": API_KEY }
             headers: header,
             data:{
                 name: name,
-                userDate: userData
+                userData: userData
             }
         }).then(response =>res.json(response.data)).catch(err => res.json((err.response.data)));
     })
