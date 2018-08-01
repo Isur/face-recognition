@@ -28,18 +28,45 @@ req: {
     userData: String
 }
 
-res: ...
+res: {
+    persistedFaceId: String
+}
+
+4) add face to person from file
+POST http://localhost:5000/add/addFaceFile/persongroup/:personGroupId/persons/:personId
+req: image //binary image for example .jpg
+
+res: {
+    persistedFaceId: String
+}
 
 FACE STUFF
-4) Get information about face
+5) Get information about face from file
+POST http://localhost:5000/face/detect/file/
+req: image //binary image for example .jpg
+
+res: [
+    faceId: {},
+    faceRectangle: {},
+    faceLandmarks: {},
+    faceAttributes: {}
+]
+
+
+6) Get information about face from url
 POST http://localhost:5000/face/detect/
 req: {
     imageURL: String // url of image
 }
 
-res: ...
+res: [
+    faceId: {},
+    faceRectangle: {},
+    faceLandmarks: {},
+    faceAttributes: {}
+]
 
-5) Identify face
+7) Identify face
 POST http://localhost:5000/face/identify/
 req: {
     faceIds: array of strings
@@ -62,7 +89,7 @@ res: [
 ]
 
 GET STUFF
-6) get all from  given list
+8) get all from  given list
 GET http://localhost:5000/get/all/:faceListId
 
 res: {
@@ -73,7 +100,7 @@ res: {
 
 }
 
-7) get all lists
+9) get all lists
 GET http://localhost:5000/get/lists
 
 res: [
@@ -85,7 +112,7 @@ res: [
     }
 ]
 
-8) get all person groups
+10) get all person groups
 GET http://localhost:5000/get/personGroups
 
 res: [
@@ -97,12 +124,16 @@ res: [
     }
 ]
 
-9) get person group by id
+11) get person group by id
 GET http://localhost:5000/get/personGroups/:personGroupId
 
-res: ...
+res: {
+    "personGroupId": String,
+    "name": String,
+    "userData": String
+}
 
-10) get people from person group
+12) get people from person group
 GET http://localhost:5000/get/personlist/:personGroupId
 
 res: [
@@ -115,27 +146,35 @@ res: [
     }
 ]
 
-11) get person from person group by id
+13) get person from person group by id
 GET http://localhost:5000/get/person?personGroupId=[]&personId=[]
 
-res: ...
+res: {
+    "personId": String,
+    "persistedFaceIds": [],
+    "name": String,
+    "userData": String
+}
 
-12) get person face by id/ by person/ by person group
+14) get person face by id/ by person/ by person group
 GET http://localhost:5000/get/personface?personGroupId=[]&personId=[]&face_id=[]
 
-res: ...
+res: {
+    "persistedFaceId": String,
+    "userData": String
+}
 
-13) 14) 15) - remove
+15) 16) 17) - remove
 
 TRAINING
-16) POST http://localhost:5000/train/traingroup/
+18) POST http://localhost:5000/train/traingroup/
 req.body: {
     personGroupId: String
 }
 
 res: ...
 
-17) POST http://localhost:5000/train/trainstatus/
+19) POST http://localhost:5000/train/trainstatus/
 req.body: {
     personGroupId: String
 }
