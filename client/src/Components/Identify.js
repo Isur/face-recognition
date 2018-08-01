@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form , Button, Icon, Label, Image, Table, Segment, TableCell } from 'semantic-ui-react';
+import { Form , Button, Image, Table, Segment } from 'semantic-ui-react';
 import axios from "axios";
 
 const TableRow = (props) => {
@@ -11,8 +11,7 @@ const TableRow = (props) => {
     )
 }
 
-const ResultTable = (props) => {
-    console.log(props.candidates)
+const ResultTable = (props) =>{
     return(
     <Table  celled  selectable>
         <Table.Header>
@@ -22,70 +21,92 @@ const ResultTable = (props) => {
             </Table.Row>
         </Table.Header>
         <Table.Body>
-        {props.candidates.map((can) => 
-            <TableRow key={can.personId} element={can.name} value={can.confidence} />)}
+        {props.candidates.map((candidate) =>
+            <TableRow key={candidate.personId} element={candidate.personName} value={candidate.confidence} />)}
         </Table.Body>
     </Table>
     )
 }
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 
 class Identify extends React.Component{
     constructor(){
         super();
         this.state = {
             imageURL: '',
-            result: '',
             resultReady: false,
-            faceIds: [],
-            candidates: []
+            candidates: [],
         }
         this.InputChange = this.InputChange.bind(this);
         this.getResult = this.getResult.bind(this);
     }
-    getResult = (event) => {
-        event.preventDefault();
+
+    getFaceId = () => {
+      return new Promise((resolve, reject) => {
         axios({
-            method: 'post',
-            url: '/face/detect',
-            data:{
-                imageURL: this.state.imageURL
-            }
-        }).then(res => this.setState({result: res.data, resultReady: false, faceIds: res.data.map((data) => data.faceId)}, () =>  
-            axios({
-                method: 'post',
-                url: '/face/identify',
-                data:{
-                    faceIds: this.state.faceIds,
-                    personGroupId: "presidents"
-                }
-            }).then(res => this.setState({result: res.data, resultReady: false, candidates: res.data[0].candidates}, () => {
-            var i = 0; 
-            var cans = this.state.candidates;   
-            console.log(`andzrej ${cans}`);
-            this.state.candidates.map((item) => {
-                    axios({
-                        method: 'get',
-                        url: `/get/person/?personId=${item.personId}&personGroupId=presidents`
-                    }).then(res => {
-                        cans[i].name = res.data.name;
-                        i ++;
-                        this.setState({candidates: cans}, () => this.setState({resultReady: true}))
-                    });
-                })
-                
-            }
-        ))    
-    ));
-    
+          method: 'post',
+          url: '/face/detect',
+          data:{
+            imageURL: this.state.imageURL
+          }
+        })
+        .then(res=>resolve(res.data.map(item => item.faceId)))
+        .catch(err => reject(err));
+      })
+    }
+
+    identifyFace = (faceIds) => {
+      return new Promise((resolve, reject) => {
+        axios({
+          method: 'post',
+          url: '/face/identify',
+          data:{
+            faceIds: faceIds,
+            personGroupId: "presidents"
+          }
+        })
+        .then(res => resolve(res.data))
+        .catch(err => reject(err));
+      })
+    }
+
+
+
+    getName = (personId) => {
+      return new Promise((resolve, reject) => {
+        axios({
+          method: 'get',
+          url: `/get/person/?personId=${personId}&personGroupId=presidents`
+        })
+        .then(res => resolve(res.data.name))
+        .catch(err => reject(err));
+      })
+    }
+
+    setFaceAndCandidates = (faceAndCandidates) =>{
+      return new Promise((resolve, reject) => {
+        const results = faceAndCandidates.candidates.map(
+            async (item) => this.getName(item.personId).then(res => {item.personName = res; return item})
+         );
+        Promise.all(results).then((res) => resolve(res));
+      })
+    }
+
+    getResult = (event) => {
+      event.preventDefault();
+      this.getFaceId()
+        .then(res => this.identifyFace(res)
+          .then(res => this.setFaceAndCandidates(res[0])
+            .then(res => this.setState({candidates: res, resultReady: true}))
+          )
+          .catch(err => console.log(err))
+        )
+        .catch(err => console.log(err));
     }
 
     InputChange = (event) =>{
         this.setState({
-            imageURL: event.target.value
+            imageURL: event.target.value,
+            resultReady: false
         })
     }
 

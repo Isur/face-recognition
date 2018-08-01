@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form , Button, Icon, Label, Image, Table, Segment } from 'semantic-ui-react';
+import { Form , Button, Image, Table, Segment } from 'semantic-ui-react';
 import axios from "axios";
 
 const TableRow = (props) => {
