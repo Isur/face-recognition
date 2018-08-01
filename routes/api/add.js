@@ -7,6 +7,11 @@ const API_REGION = require('../../config/keys').api_region;
 
 const link = `https://${API_REGION}.api.cognitive.microsoft.com/face/v1.0/`;
 const header = { "Ocp-Apim-Subscription-Key": API_KEY }
+const headerBinary = {
+    "Content-Type": "application/octet-stream",
+    "Ocp-Apim-Subscription-Key": API_KEY
+    
+}
 
 // CREATE PERSON GROUP
     router.post('/addPersonGroup/', (req,res) => {
@@ -42,7 +47,7 @@ const header = { "Ocp-Apim-Subscription-Key": API_KEY }
             }
         }).then(response =>res.json(response.data)).catch(err => res.json((err.response.data)));
     })
-// ADD FACE TO PERSON
+// ADD FACE TO PERSON FROM URL
 router.post('/addFace', (req, res) => {
     const personId = req.body.personId;
     const personGroupId = req.body.personGroupId;
@@ -56,6 +61,22 @@ router.post('/addFace', (req, res) => {
         data:{
             url: image
         }
+    }).then(response =>res.json(response.data)).catch(err => res.json((err.response.data)));
+
+})
+
+// ADD FACE TO PERSON FROM FILE
+router.post('/addFaceFile/persongroup/:personGroupId/persons/:personId', (req, res) => {
+    const personId = req.params.personId;
+    const personGroupId = req.params.personGroupId;
+    const image = req.body;
+    const query = link + `persongroups/${personGroupId}/persons/${personId}/persistedFaces`;
+
+    axios({
+        method: 'post',
+        url: query,
+        headers: headerBinary,
+        data: image
     }).then(response =>res.json(response.data)).catch(err => res.json((err.response.data)));
 
 })
