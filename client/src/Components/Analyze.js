@@ -35,20 +35,38 @@ class Analyze extends React.Component{
         this.state = {
             imageURL: '',
             result: '',
-            resultReady: false
+            resultReady: false,
+            file: null,
+            fileOrURL: 'file'
         }
         this.InputChange = this.InputChange.bind(this);
         this.getResult = this.getResult.bind(this);
+        
     }
     getResult = (event) => {
         event.preventDefault();
-        axios({
-            method: 'post',
-            url: '/face/detect',
-            data:{
-                imageURL: this.state.imageURL
-            }
-        }).then(res => this.setState({result: res.data, resultReady: true}, () => console.log(this.state.result[0])));
+        if(this.state.fileOrURL === 'url'){
+            axios({
+                method: 'post',
+                url: '/face/detect',
+                data:{
+                    imageURL: this.state.imageURL
+                }
+            })
+                .then(res => this.setState({result: res.data, resultReady: true}))
+                .catch(err => console.log(err));
+        } else if(this.state.fileOrURL === 'file'){
+            axios({
+                method: 'post',
+                url: `/face/detect/file`,
+                headers:{
+                    "Content-Type": "application/octet-stream",
+                },
+                data: this.state.file
+            })
+                .then(res => this.setState({result: res.data, resultReady: true, imageURL: null}))
+                .catch(err => console.log(err));
+        }
     }
 
     InputChange = (event) =>{
@@ -56,16 +74,38 @@ class Analyze extends React.Component{
             imageURL: event.target.value
         })
     }
+    onChangeRadio = (event, data) => {
+        this.setState({
+            fileOrURL: data.value
+        })
+    }
 
+    onChangeFile = (event, data) => {
+        if(event.target.files.length !== 0)
+            this.setState({
+                file: event.target.files[0]
+            });
+        else 
+            this.setState({
+                file: null
+            });
+    }
     render(){
         return(
             <Segment>
             <Header size='huge'> Analiza twarzy </Header>
             <Form>
-                <Form.Input placeholder="Adres do zdjęcia" onChange={this.InputChange} />
+            <Form.Group fluid widths={4}>
+                    <Form.Input placeholder="URL zdjęcia" onChange={this.InputChange} name="imageURL" type="text" disabled={this.state.fileOrURL=== 'file'} />
+                    <Form.Radio label="URL" name="fileOrURL" value="url" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='url'}/>
+                </Form.Group>
+                <Form.Group fluid widths={4}>
+                    <Form.Input placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
+                    <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
+                </Form.Group>
                 <Button onClick={this.getResult}>Prześlij</Button>
             </Form>
-           {this.state.resultReady && <div><Image src={this.state.imageURL} /> <ResultTable fa={this.state.result[0].faceAttributes} /> </div>}
+           {this.state.resultReady && <div><Image src={this.state.imageURL} size="medium" /> <ResultTable fa={this.state.result[0].faceAttributes} /> </div>}
             </Segment>
         )
     }

@@ -10,7 +10,6 @@ import AddPerson from './AddPerson';
 import AddPersonGroup from './AddPersonGroup';
 import Show from './Show';
 const Router = (props) => {
-    console.log(props.id);
     return(
         <Switch>
             <Route exact path="/" component={Home}/>

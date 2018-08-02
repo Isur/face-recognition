@@ -87,7 +87,6 @@ class ShowAll extends React.Component{
             method: 'delete',
             url: `delete/person/?personGroupId=${this.state.personGroupId}&personId=${id}`,
         }).then(res => {
-                console.log(res);
                 this.getPersons().then(res => {this.setState({
                     persons: res
                 })
@@ -104,14 +103,12 @@ class ShowAll extends React.Component{
             method: 'delete',
             url: `delete/persongroup/${this.state.personGroupId}`,
         }).then(res => {
-            console.log(res);
             this.setPersonGroupDropdownOptions();
         });
 
     }
 
     render(){
-        this.state.persons.map(item => console.log(item));
         return(
             <Segment>
                 <label>

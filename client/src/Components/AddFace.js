@@ -34,14 +34,12 @@ class AddFace extends React.Component{
             this.setState({
                 personGroups: res.data
             }, () => {
-                let options = [];
-                let i = 0
-                this.state.personGroups.map(item => {
-                    options[i] = {};
-                    options[i].text = item.name;
-                    options[i].value = item.personGroupId;
-                    options[i].key = i;
-                    i++;
+                let options = this.state.personGroups.map(item => {
+                    let option = {};
+                    option.text = item.name;
+                    option.value = item.personGroupId;
+                    option.key = item.personGroupId;
+                    return option;
                 });
                 this.setState({groupOptions: options});
             })
@@ -182,14 +180,12 @@ class AddFace extends React.Component{
                 this.setState({
                     persons: res.data
                 }, () => {
-                    let options = [];
-                    let i = 0
-                    this.state.persons.map(item => {
-                    options[i] = {};
-                    options[i].text = item.name;
-                    options[i].value = item.personId;
-                    options[i].key = i;
-                    i++;
+                    let options = this.state.persons.map(item => {
+                    let option = {};
+                    option.text = item.name;
+                    option.value = item.personId;
+                    option.key = item.personId;
+                    return option;
                 });
                 this.setState({personOptions: options}, () => this.validatePersonGroupId());
                 })
@@ -204,7 +200,6 @@ class AddFace extends React.Component{
     }
 
     onChangeFile = (event, data) => {
-        console.log(event.target.files.length)
         if(event.target.files.length !== 0)
             this.setState({
                 file: event.target.files[0]

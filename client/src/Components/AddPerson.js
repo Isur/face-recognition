@@ -28,14 +28,12 @@ class AddPerson extends React.Component{
             this.setState({
                 personGroups: res.data
             }, () => {
-                let options = [];
-                let i = 0
-                this.state.personGroups.map(item => {
-                    options[i] = {};
-                    options[i].text = item.name;
-                    options[i].value = item.personGroupId;
-                    options[i].key = i;
-                    i++;
+                let options = this.state.personGroups.map(item => {
+                    let option = {};
+                    option.text = item.name;
+                    option.value = item.personGroupId;
+                    option.key = item.personGroupId;
+                    return option;
                 });
                 this.setState({options: options});
             })
