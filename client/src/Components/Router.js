@@ -8,6 +8,7 @@ import Identify from './Identify';
 import AddFace from './AddFace';
 import AddPerson from './AddPerson';
 import AddPersonGroup from './AddPersonGroup';
+import Show from './Show';
 const Router = (props) => {
     console.log(props.id);
     return(
@@ -19,6 +20,7 @@ const Router = (props) => {
             <Route exact path="/addperson" component={AddPerson} />
             <Route exact path="/addface" component={AddFace} />
             <Route exact path="/addpersongroup" component={AddPersonGroup} />
+            <Route exact path="/show" component={Show} />
             <Route component={NotFound} />
         </Switch>
     );

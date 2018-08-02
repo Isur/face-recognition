@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form , Button, Image, Table, Segment } from 'semantic-ui-react';
+import { Form , Button, Image, Table, Segment, Header } from 'semantic-ui-react';
 import axios from "axios";
 
 const TableRow = (props) => {
@@ -60,6 +60,7 @@ class Analyze extends React.Component{
     render(){
         return(
             <Segment>
+            <Header size='huge'> Analiza twarzy </Header>
             <Form>
                 <Form.Input placeholder="Adres do zdjęcia" onChange={this.InputChange} />
                 <Button onClick={this.getResult}>Prześlij</Button>
