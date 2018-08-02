@@ -107,7 +107,7 @@ class Analyze extends React.Component{
                     <Form.Input placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
                     <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
                 </Form.Group>
-                <Button onClick={this.getResult}>Prześlij</Button>
+                <Button disabled={(this.state.file === null && this.state.fileOrURL === 'file') || (this.state.imageURL === '' && this.state.fileOrURL === 'url')} onClick={this.getResult}>Prześlij</Button>
             </Form>
             {this.state.loading && <Loading />}
            {this.state.resultReady && <div><Image src={this.state.imageURL} size="medium" /> <ResultTable fa={this.state.result[0].faceAttributes} /> </div>}

@@ -113,6 +113,7 @@ class Identify extends React.Component{
                 .then(res => this.identifyFace(res)
                 .then(res => this.setFaceAndCandidates(res[0])
                 .then(res => this.setState({candidates: res, resultReady: true, loading: false}))
+                    .catch(err => console.log(err))
                 )
                 .catch(err => console.log(err))
             )
@@ -162,7 +163,7 @@ class Identify extends React.Component{
                     <Form.Input placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
                     <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
                 </Form.Group>
-                <Button onClick={this.getResult}>Prześlij</Button>
+                <Button disabled={(this.state.file === null && this.state.fileOrURL === 'file') || (this.state.imageURL === '' && this.state.fileOrURL === 'url')} onClick={this.getResult}>Prześlij</Button>
             </Form>
             {this.state.loading && <Loading />}
            {this.state.resultReady && this.state.fileOrURL ==='url' && <Image src={this.state.imageURL}size="medium" />}

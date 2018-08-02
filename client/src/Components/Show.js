@@ -1,7 +1,7 @@
 import React from "react";
 import { Segment, Dropdown, Button, Card, Divider } from 'semantic-ui-react';
 import axios from 'axios';
-
+import Loading from './Loading';
 const MyCard = (props) => {
     return(
         <Card>
@@ -38,6 +38,7 @@ class ShowAll extends React.Component{
     }
 
     setPersonGroupDropdownOptions = () => {
+        this.setState({loading: true});
         this.getPersonGroups()
             .then(res => {
                 const options = res.map(item => {
@@ -48,7 +49,8 @@ class ShowAll extends React.Component{
                     return opt;
                 })
                 this.setState({
-                    personGroupsOptions: options
+                    personGroupsOptions: options,
+                    loading: false
                 })
             })
             .catch(err => console.log(err));
@@ -73,22 +75,26 @@ class ShowAll extends React.Component{
     dropdownChange = (event, data) => {
         this.setState({
             personGroupId: data.value,
+            loading: true
         }, () => {
             this.getPersons().then(res =>{
                 this.setState({
-                    persons: res
+                    persons: res,
+                    loading: false
                 })
             });
         });
     }
 
     deletePerson = (id) =>{
+        this.setState({loading: true});
         axios({
             method: 'delete',
             url: `delete/person/?personGroupId=${this.state.personGroupId}&personId=${id}`,
         }).then(res => {
                 this.getPersons().then(res => {this.setState({
-                    persons: res
+                    persons: res,
+                    loading: false
                 })
             });
         })
@@ -122,6 +128,7 @@ class ShowAll extends React.Component{
              Liczba osób w grupie: {this.state.persons.length}
             </Divider></div>}
             <Divider />
+            {this.state.loading && <Loading />}
             <Card.Group>
                 {this.state.persons.map(item => (
                     <MyCard key={item.personId} id={item.personId} name={item.name} fullName={item.userData} faces={item.persistedFaceIds} deletePerson={this.deletePerson}/>
