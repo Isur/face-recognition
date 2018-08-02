@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Segment, Button, Dropdown, Message } from 'semantic-ui-react';
 import axios from 'axios';
+import Loading from './Loading';
 
 class AddFace extends React.Component{
     constructor(){
@@ -112,6 +113,7 @@ class AddFace extends React.Component{
         event.preventDefault();
         this.validateAll();
         if(this.state.error === false){
+            this.setState({loading: true})
             if(this.state.fileOrURL === 'url'){
                 axios({
                     method: 'post',
@@ -125,18 +127,21 @@ class AddFace extends React.Component{
                     if(res.data.error === undefined ){
                         this.setState({
                             success: true,
-                            message: "Twarz doddana!" 
+                            message: "Twarz doddana!" ,
+                            loading: false
                         })
                     } else {
                         this.setState({
                             success: false,
-                            message: 'Nie udało się dodać twarzy!'
+                            message: 'Nie udało się dodać twarzy!',
+                            loading: false
                         })
                     }
                 }).catch(err => {
                     this.setState({
                         success: false,
-                        message: "Wysyłanie nie powiodło się!"
+                        message: "Wysyłanie nie powiodło się!",
+                        loading: false
                     })
                 })
             } else if(this.state.fileOrURL === 'file'){
@@ -151,18 +156,21 @@ class AddFace extends React.Component{
                     if(res.data.error === undefined ){
                         this.setState({
                             success: true,
-                            message: "Twarz doddana!" 
+                            message: "Twarz doddana!",
+                            loading: false
                         })
                     } else {
                         this.setState({
                             success: false,
-                            message: 'Nie udało się dodać twarzy!'
+                            message: 'Nie udało się dodać twarzy!',
+                            loading: false
                         })
                     }
                 }).catch(err => {
                     this.setState({
                         success: false,
-                        message: "Wysyłanie nie powiodło się!"
+                        message: "Wysyłanie nie powiodło się!",
+                        loading: false
                     })
                 });
             }  
@@ -171,7 +179,8 @@ class AddFace extends React.Component{
 
     dropdownChangeGroup = (event, data) => {
         this.setState({
-            personGroupId: data.value
+            personGroupId: data.value,
+            loading: true
         }, () => {
             axios({
                 method: 'get',
@@ -187,7 +196,7 @@ class AddFace extends React.Component{
                     option.key = item.personId;
                     return option;
                 });
-                this.setState({personOptions: options}, () => this.validatePersonGroupId());
+                this.setState({personOptions: options,loading: false}, () => this.validatePersonGroupId());
                 })
             })
         })
@@ -234,6 +243,7 @@ class AddFace extends React.Component{
                 </Form.Group>
                 <Button disabled={this.state.error} type="submit" onClick={this.submit}> Dodaj </Button>
             </Form>
+            {this.state.loading && <Loading />}
             {this.state.error && <Message error>
                 {this.state.message}     
             </Message>}

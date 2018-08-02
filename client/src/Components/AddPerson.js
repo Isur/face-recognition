@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Segment, Button, Dropdown, Message } from 'semantic-ui-react';
 import axios from 'axios';
+import Loading from './Loading';
 
 class AddPerson extends React.Component{
     constructor(){
@@ -101,6 +102,7 @@ class AddPerson extends React.Component{
     submit = (event) => {
         event.preventDefault();
         this.validataAll();
+        this.setState({loading: true});
         axios({
             method: 'post',
             url: '/add/addPerson',
@@ -113,12 +115,14 @@ class AddPerson extends React.Component{
             if(res.data.error === undefined ){
                 this.setState({
                     success: true,
-                    message: "Oosba doddana!" 
+                    message: "Oosba doddana!",
+                    loading: false 
                 })
             } else {
                 this.setState({
                     success: false,
-                    message: 'Nie udało się dodać osoby!'
+                    message: 'Nie udało się dodać osoby!',
+                    loading: false
                 })
             }
         })
@@ -139,6 +143,7 @@ class AddPerson extends React.Component{
                 <Dropdown error={this.state.errorPersonGroupId}  placeholder="Grupa" options={this.state.options} compact selection onChange={this.dropdownChange} />
                 <Button disabled={this.state.error} type="submit" onClick={this.submit}> Dodaj </Button>
             </Form>
+            {this.state.loading && <Loading />}
             {this.state.error && <Message error>
                 {this.state.message}     
             </Message>}
