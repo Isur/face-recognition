@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Segment, Button, Dropdown } from 'semantic-ui-react';
+import { Form, Segment, Button, Dropdown, Message } from 'semantic-ui-react';
 import axios from 'axios';
 
 class AddFace extends React.Component{
@@ -15,6 +15,12 @@ class AddFace extends React.Component{
             personOptions: [],
             fileOrURL: 'file',
             file: null,
+            errorImage: true,
+            errorPersonGroupId: true,
+            errorPersonId: true,
+            error: true,
+            success: '',
+            message: "Wypełnij wszystkie pola."
         }
         this.onChange = this.onChange.bind(this);
         this.submit = this.submit.bind(this);
@@ -42,36 +48,127 @@ class AddFace extends React.Component{
         })
     }
 
+    isError = () => {
+        if(this.state.errorImage || this.state.errorPersonGroupId || this.state.errorPersonId){
+            this.setState({
+                error : true,
+                message : "Brak lub błędnie wprowadzone dane.",
+                success: '',
+            })
+         } else {
+             this.setState({
+                 error: false,
+                 success: '',
+             })
+         }
+    }
 
+    validateAll = () => {
+        this.validateImage();
+        this.validatePersonGroupId();
+        this.validatePersonId();
+    }
+
+    validatePersonId = () => {
+        if(this.state.personId === '')
+            this.setState({errorPersonId: true}, () => this.isError());
+        else
+            this.setState({errorPersonId: false}, () => this.isError());
+    }
+
+    validatePersonGroupId = () => {
+        if(this.state.personGroupId === '')
+            this.setState({errorPersonGroupId: true}, () => this.isError());
+        else
+            this.setState({errorPersonGroupId: false}, () => this.isError());
+    }
+
+    validateImageUrl = () => {
+        if(this.state.imageURL === '')
+            this.setState({errorImage: true}, () => this.isError());
+        else
+            this.setState({errorImage: false}, () => this.isError());
+    }
+
+    validateImageFile = () => {
+        if(this.state.file === null)
+            this.setState({errorImage: true}, () => this.isError());
+        else
+            this.setState({errorImage: false}, () => this.isError());
+    }
+
+    validateImage = () => {
+        if(this.state.fileOrURL === 'url')
+            this.validateImageUrl();
+        else if( this.state.fileOrURL === 'file')
+            this.validateImageFile();
+    }
 
     onChange = (event) => {
         this.setState({
             [event.target.name]: event.target.value
-        })
+        }, () =>  this.validateImage())
     }
 
     submit = (event) => {
         event.preventDefault();
-        if(this.state.fileOrURL === 'url'){
-            axios({
-                method: 'post',
-                url: '/add/addFace',
-                data:{
-                    personId: this.state.personId,
-                    personGroupId: this.state.personGroupId,
-                    image: this.state.imageURL
-                }
-            })
-        } else if(this.state.fileOrURL === 'file'){
-            axios({
-                method: 'post',
-                url: `/add/addFaceFile/persongroup/${this.state.personGroupId}/persons/${this.state.personId}`,
-                headers:{
-                    "Content-Type": "application/octet-stream",
-                },
-                data: this.state.file
-            }).then(res => console.log(res)).catch(err => console.log(err));
-        }  
+        this.validateAll();
+        if(this.state.error === false){
+            if(this.state.fileOrURL === 'url'){
+                axios({
+                    method: 'post',
+                    url: '/add/addFace',
+                    data:{
+                        personId: this.state.personId,
+                        personGroupId: this.state.personGroupId,
+                        image: this.state.imageURL
+                    }
+                }).then(res => {
+                    if(res.data.error === undefined ){
+                        this.setState({
+                            success: true,
+                            message: "Twarz doddana!" 
+                        })
+                    } else {
+                        this.setState({
+                            success: false,
+                            message: 'Nie udało się dodać twarzy!'
+                        })
+                    }
+                }).catch(err => {
+                    this.setState({
+                        success: false,
+                        message: "Wysyłanie nie powiodło się!"
+                    })
+                })
+            } else if(this.state.fileOrURL === 'file'){
+                axios({
+                    method: 'post',
+                    url: `/add/addFaceFile/persongroup/${this.state.personGroupId}/persons/${this.state.personId}`,
+                    headers:{
+                        "Content-Type": "application/octet-stream",
+                    },
+                    data: this.state.file
+                }).then(res => {
+                    if(res.data.error === undefined ){
+                        this.setState({
+                            success: true,
+                            message: "Twarz doddana!" 
+                        })
+                    } else {
+                        this.setState({
+                            success: false,
+                            message: 'Nie udało się dodać twarzy!'
+                        })
+                    }
+                }).catch(err => {
+                    this.setState({
+                        success: false,
+                        message: "Wysyłanie nie powiodło się!"
+                    })
+                });
+            }  
+        }
     }
 
     dropdownChangeGroup = (event, data) => {
@@ -94,7 +191,7 @@ class AddFace extends React.Component{
                     options[i].key = i;
                     i++;
                 });
-                this.setState({personOptions: options});
+                this.setState({personOptions: options}, () => this.validatePersonGroupId());
                 })
             })
         })
@@ -103,40 +200,54 @@ class AddFace extends React.Component{
     dropdownChangePerson = (event, data) => {
         this.setState({
             personId: data.value
-        }, () => {console.log(this.state.personId)})
+        }, () => this.validatePersonId())
     }
 
     onChangeFile = (event, data) => {
-        this.setState({
-            file: event.target.files[0]
-        }, () => console.log(data));
+        console.log(event.target.files.length)
+        if(event.target.files.length !== 0)
+            this.setState({
+                file: event.target.files[0]
+            }, () => this.validateImage());
+        else 
+            this.setState({
+                file: null
+            }, () => this.validateImage());
     }
 
     onChangeRadio = (event, data) => {
         this.setState({
             fileOrURL: data.value
-        })
+        }, () => this.validateImage())
     }
 
     render(){
-        console.log(this.state.fileOrURL);
         return(
             <Segment>
             <Form>
                 <Form.Group fluid widths={4}>
-                    <Form.Input placeholder="URL zdjęcia" onChange={this.onChange} name="imageURL" type="text" disabled={this.state.fileOrURL=== 'file'} />
+                    <Form.Input error={this.state.errorImage && this.state.fileOrURL==='url'} placeholder="URL zdjęcia" onChange={this.onChange} name="imageURL" type="text" disabled={this.state.fileOrURL=== 'file'} />
                     <Form.Radio label="URL" name="fileOrURL" value="url" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='url'}/>
                 </Form.Group>
                 <Form.Group fluid widths={4}>
-                    <Form.Input placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
+                    <Form.Input error={this.state.errorImage && this.state.fileOrURL==='file'} placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
                     <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
                 </Form.Group>
                 <Form.Group fluid widths={4}>
-                    <Dropdown placeholder="Grupa" name="personGroupId" options={this.state.groupOptions} compact selection onChange={this.dropdownChangeGroup} />
-                    <Dropdown placeholder="Osoba" name="personId" options={this.state.personOptions} compact selection onChange={this.dropdownChangePerson} />
+                    <Dropdown error={this.state.errorPersonGroupId} placeholder="Grupa" name="personGroupId" options={this.state.groupOptions} compact selection onChange={this.dropdownChangeGroup} />
+                    <Dropdown error={this.state.errorPersonId}placeholder="Osoba" name="personId" options={this.state.personOptions} compact selection onChange={this.dropdownChangePerson} />
                 </Form.Group>
-                <Button type="submit" onClick={this.submit}> Dodaj </Button>
+                <Button disabled={this.state.error} type="submit" onClick={this.submit}> Dodaj </Button>
             </Form>
+            {this.state.error && <Message error>
+                {this.state.message}     
+            </Message>}
+            {this.state.success === true && <Message positive>
+                {this.state.message}            
+            </Message>}
+            {this.state.success === false && <Message negative>
+                {this.state.message}            
+            </Message>}
             </Segment>
         )
     }

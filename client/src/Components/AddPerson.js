@@ -112,7 +112,6 @@ class AddPerson extends React.Component{
                 userData: this.state.userData
             }
         }).then(res => {
-            console.log(res);
             if(res.data.error === undefined ){
                 this.setState({
                     success: true,
