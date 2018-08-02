@@ -220,15 +220,15 @@ class AddFace extends React.Component{
         return(
             <Segment>
             <Form>
-                <Form.Group fluid widths={4}>
+                <Form.Group  widths={4}>
                     <Form.Input error={this.state.errorImage && this.state.fileOrURL==='url'} placeholder="URL zdjęcia" onChange={this.onChange} name="imageURL" type="text" disabled={this.state.fileOrURL=== 'file'} />
                     <Form.Radio label="URL" name="fileOrURL" value="url" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='url'}/>
                 </Form.Group>
-                <Form.Group fluid widths={4}>
+                <Form.Group  widths={4}>
                     <Form.Input error={this.state.errorImage && this.state.fileOrURL==='file'} placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
                     <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
                 </Form.Group>
-                <Form.Group fluid widths={4}>
+                <Form.Group  widths={4}>
                     <Dropdown error={this.state.errorPersonGroupId} placeholder="Grupa" name="personGroupId" options={this.state.groupOptions} compact selection onChange={this.dropdownChangeGroup} />
                     <Dropdown error={this.state.errorPersonId}placeholder="Osoba" name="personId" options={this.state.personOptions} compact selection onChange={this.dropdownChangePerson} />
                 </Form.Group>
