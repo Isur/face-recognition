@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form , Button, Image, Table, Segment, Header } from 'semantic-ui-react';
 import axios from "axios";
-
+import Loading from './Loading';
 const TableRow = (props) => {
     return(
         <Table.Row>
@@ -108,14 +108,16 @@ class Identify extends React.Component{
 
     getResult = (event) => {
       event.preventDefault();
-      this.getFaceId()
-        .then(res => this.identifyFace(res)
-          .then(res => this.setFaceAndCandidates(res[0])
-            .then(res => this.setState({candidates: res, resultReady: true}))
-          )
-          .catch(err => console.log(err))
-        )
-        .catch(err => console.log(err));
+      this.setState({loading: true}, () => {
+                this.getFaceId()
+                .then(res => this.identifyFace(res)
+                .then(res => this.setFaceAndCandidates(res[0])
+                .then(res => this.setState({candidates: res, resultReady: true, loading: false}))
+                )
+                .catch(err => console.log(err))
+            )
+            .catch(err => console.log(err));
+        })
     }
 
     InputChange = (event) =>{
@@ -132,6 +134,7 @@ class Identify extends React.Component{
     onChangeRadio = (event, data) => {
         this.setState({
             fileOrURL: data.value,
+            resultReady: false,
             candidates: []
         })
     }
@@ -161,6 +164,7 @@ class Identify extends React.Component{
                 </Form.Group>
                 <Button onClick={this.getResult}>Prześlij</Button>
             </Form>
+            {this.state.loading && <Loading />}
            {this.state.resultReady && this.state.fileOrURL ==='url' && <Image src={this.state.imageURL}size="medium" />}
            {this.state.resultReady &&  <ResultTable candidates={this.state.candidates} />}
             </Segment>

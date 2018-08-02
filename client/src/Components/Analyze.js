@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form , Button, Image, Table, Segment, Header } from 'semantic-ui-react';
 import axios from "axios";
+import Loading from './Loading';
 
 const TableRow = (props) => {
     return(
@@ -45,28 +46,30 @@ class Analyze extends React.Component{
     }
     getResult = (event) => {
         event.preventDefault();
-        if(this.state.fileOrURL === 'url'){
-            axios({
-                method: 'post',
-                url: '/face/detect',
-                data:{
-                    imageURL: this.state.imageURL
-                }
-            })
-                .then(res => this.setState({result: res.data, resultReady: true}))
-                .catch(err => console.log(err));
-        } else if(this.state.fileOrURL === 'file'){
-            axios({
-                method: 'post',
-                url: `/face/detect/file`,
-                headers:{
-                    "Content-Type": "application/octet-stream",
-                },
-                data: this.state.file
-            })
-                .then(res => this.setState({result: res.data, resultReady: true, imageURL: null}))
-                .catch(err => console.log(err));
-        }
+        this.setState({loading:true}, () => {
+            if(this.state.fileOrURL === 'url'){
+                axios({
+                    method: 'post',
+                    url: '/face/detect',
+                    data:{
+                        imageURL: this.state.imageURL
+                    }
+                })
+                    .then(res => this.setState({result: res.data, resultReady: true,loading:false}))
+                    .catch(err => console.log(err));
+            } else if(this.state.fileOrURL === 'file'){
+                axios({
+                    method: 'post',
+                    url: `/face/detect/file`,
+                    headers:{
+                        "Content-Type": "application/octet-stream",
+                    },
+                    data: this.state.file
+                })
+                    .then(res => this.setState({result: res.data, resultReady: true, imageURL: null,loading:false}))
+                    .catch(err => console.log(err));
+            }
+        })
     }
 
     InputChange = (event) =>{
@@ -76,7 +79,8 @@ class Analyze extends React.Component{
     }
     onChangeRadio = (event, data) => {
         this.setState({
-            fileOrURL: data.value
+            fileOrURL: data.value,
+            resultReady: false
         })
     }
 
@@ -105,6 +109,7 @@ class Analyze extends React.Component{
                 </Form.Group>
                 <Button onClick={this.getResult}>Prześlij</Button>
             </Form>
+            {this.state.loading && <Loading />}
            {this.state.resultReady && <div><Image src={this.state.imageURL} size="medium" /> <ResultTable fa={this.state.result[0].faceAttributes} /> </div>}
             </Segment>
         )
