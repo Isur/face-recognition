@@ -113,7 +113,31 @@ class ShowAll extends React.Component{
         });
 
     }
-
+    trainGroup = () => {
+        this.setState({loading: true},()=>{
+            axios({
+                method: 'post',
+                url: '/train/traingroup',
+                data:{
+                    personGroupId: this.state.personGroupId
+                }
+            }).then(res => {
+                axios({
+                    method: 'post',
+                    url: '/train/trainstatus',
+                    data:{
+                        personGroupId: this.state.personGroupId
+                    }
+                }).then(res => {
+                    if(res.data.status !== "succeeded") 
+                        alert(res.data.message)
+                    else 
+                        alert("Success!");
+                    this.setState({loading: false});
+                });
+            })
+        })
+    }
     render(){
         return(
             <Segment>
@@ -124,6 +148,7 @@ class ShowAll extends React.Component{
             <Dropdown placeholder="Grupa" options={this.state.personGroupsOptions} selection onChange={this.dropdownChange} />
             {this.state.personGroupId &&  <div><Divider />
             <Button negative onClick={this.deleteGroup}> Usuń Grupę </Button>
+            <Button positive onClick={this.trainGroup}> Trenuj Grupę </Button>
             <Divider horizontal>
              Liczba osób w grupie: {this.state.persons.length}
             </Divider></div>}

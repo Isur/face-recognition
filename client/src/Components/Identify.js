@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form , Button, Image, Table, Segment, Header } from 'semantic-ui-react';
+import { Form , Button, Image, Table, Segment, Header, Dropdown } from 'semantic-ui-react';
 import axios from "axios";
 import Loading from './Loading';
 const TableRow = (props) => {
@@ -36,10 +36,58 @@ class Identify extends React.Component{
             resultReady: false,
             candidates: [],
             file: null,
-            fileOrURL: 'file'
+            fileOrURL: 'file',
+            errorPersonGroupId: true,
         }
         this.InputChange = this.InputChange.bind(this);
         this.getResult = this.getResult.bind(this);
+    }
+
+    componentDidMount(){
+       this.getPersonGroups().then(res => {
+           this.getTrained(res).then(res => {
+            console.log(res);
+            let options = res.map(item => {
+                let option = {};
+                option.text = item.name;
+                option.value = item.personGroupId;
+                option.key = item.personGroupId;
+                option.disabled = !item.trained;
+                return option;
+            });
+            this.setState({options: options});
+        })
+       })
+    }
+
+    getTrained = (groups) => {
+        return new Promise((resolve, reject) => {
+            const results = groups.map(
+                async (item) => this.isTrained(item.personGroupId).then(res => {item.trained = res; return item})
+             );
+            Promise.all(results).then((res) => resolve(res));
+          })
+    }
+
+    isTrained = (id) => {
+        return new Promise((resolve, reject) => {
+            axios({
+                method: 'post',
+                url: `/train/trainstatus/`,
+                data: {
+                    personGroupId: id
+                }
+            }).then(res => resolve(res.data.status === 'succeeded'))
+            .catch(err => console.log(err));
+        })
+    }
+
+    getPersonGroups = () => {
+        return new Promise((resolve, reject) => {
+            axios.get('/get/persongroups').then((res) => {
+                resolve(res.data);
+            });
+        }) 
     }
 
     getFaceId = () => {
@@ -76,7 +124,7 @@ class Identify extends React.Component{
           url: '/face/identify',
           data:{
             faceIds: faceIds,
-            personGroupId: "presidents"
+            personGroupId: this.state.personGroupId
           }
         })
         .then(res => resolve(res.data))
@@ -90,7 +138,7 @@ class Identify extends React.Component{
       return new Promise((resolve, reject) => {
         axios({
           method: 'get',
-          url: `/get/person/?personId=${personId}&personGroupId=presidents`
+          url: `/get/person/?personId=${personId}&personGroupId=${this.state.personGroupId}`
         })
         .then(res => resolve(res.data.name))
         .catch(err => reject(err));
@@ -150,11 +198,27 @@ class Identify extends React.Component{
                 file: null
             });
     }
+
+    validatePersonGroupId = () => {
+        if(this.state.personGroupId === '')
+            this.setState({errorPersonGroupId: true});
+        else 
+            this.setState({errorPersonGroupId: false});
+    }
+
+    dropdownChange = (event, data) => {
+        this.setState({
+            personGroupId: data.value
+        }, () => this.validatePersonGroupId())
+    }
+
     render(){
         return(
             <Segment>
             <Header size='huge'> Rozpoznanie twarzy </Header>
             <Form>
+            {this.state.options && <Dropdown error={this.state.errorPersonGroupId}  placeholder="Grupa" options={this.state.options} compact labeled selection onChange={this.dropdownChange} />}
+            {this.state.options && <label>*Jeśli opcja jest zablokowana, to znaczy, że grupa nie była trenowana </label> }
             <Form.Group widths={4}>
                     <Form.Input placeholder="URL zdjęcia" onChange={this.InputChange} name="imageURL" type="text" disabled={this.state.fileOrURL=== 'file'} />
                     <Form.Radio label="URL" name="fileOrURL" value="url" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='url'}/>
@@ -163,7 +227,7 @@ class Identify extends React.Component{
                     <Form.Input placeholder="Plik" name="imageFile" type="file" onChange={this.onChangeFile} disabled={this.state.fileOrURL==='url'} /> 
                     <Form.Radio label="Plik" name="fileOrURL" value="file" onChange={this.onChangeRadio} checked={this.state.fileOrURL==='file'}/>
                 </Form.Group>
-                <Button disabled={(this.state.file === null && this.state.fileOrURL === 'file') || (this.state.imageURL === '' && this.state.fileOrURL === 'url')} onClick={this.getResult}>Prześlij</Button>
+                <Button disabled={((this.state.file === null && this.state.fileOrURL === 'file') || (this.state.imageURL === '' && this.state.fileOrURL === 'url')) && this.state.errorPersonGroupId } onClick={this.getResult}>Prześlij</Button>
             </Form>
             {this.state.loading && <Loading />}
            {this.state.resultReady && this.state.fileOrURL ==='url' && <Image src={this.state.imageURL}size="medium" />}

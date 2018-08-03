@@ -31,7 +31,7 @@ router.post('/trainstatus/', (req,res) => {
         headers: header,
     })
     .then(response => res.json(response.data))
-    .catch(err => console.log(err.response.statusText));
+    .catch(err => res.json({err: err.response.statusText}));
 })
 
 
