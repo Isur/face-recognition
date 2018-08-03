@@ -44,6 +44,7 @@ class Identify extends React.Component{
     }
 
     componentDidMount(){
+        this.setState({loading: true});
        this.getPersonGroups().then(res => {
            this.getTrained(res).then(res => {
             console.log(res);
@@ -55,7 +56,7 @@ class Identify extends React.Component{
                 option.disabled = !item.trained;
                 return option;
             });
-            this.setState({options: options});
+            this.setState({options: options, loading: false});
         })
        })
     }
