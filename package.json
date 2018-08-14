@@ -25,6 +25,7 @@
     "axios": "^0.18.0",
     "azure-cognitiveservices-face": "^1.0.0-preview",
     "body-parser": "^1.18.3",
+    "concurrently": "^3.6.1",
     "express": "^4.16.3",
     "express-fileupload": "^0.4.0",
     "face-api.js": "^0.9.2",
